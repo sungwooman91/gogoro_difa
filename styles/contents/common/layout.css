@@ -1,0 +1,164 @@
+﻿/*******************************************************************************************/
+/*  작 성 자 : 바이크뱅크(주)
+/*  작 성 일 : 2022.
+/*  수 정 일 : 2022.
+/*  버     전 : 0.0.1
+/*  설     명 : 공용 프로그램 설정
+/*  위     치 : /css/contents/common/layout.css
+/*******************************************************************************************/
+
+/*******************************************************************************************/
+/*  컨텐츠 설정 시작
+/*******************************************************************************************/
+
+#ContentsWrapper h2.subject {
+  margin: 17.7px 0 0 0;
+  padding: 0 0 0 0;
+
+  color: #0f0f0f;
+  text-align: left;
+  font-size: 25px;
+  font-weight: bold;
+}
+
+/* 헤더 */
+#ContentsWrapper #header-wrapper {
+  margin: 0 auto;
+  padding: 0 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 99999;
+
+  background: #f1f1f1;
+  height: 52px;
+  border-bottom: 1px solid #dedede;
+}
+
+#ContentsWrapper div.articles {
+  padding: 52px 0 0 0;
+  /*position: fixed;
+    top: 52px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow-y: auto;*/
+}
+
+/* 뒤로가기 버튼 */
+#ContentsWrapper #header-wrapper .btn_back {
+  position: absolute;
+  top: 23.3px;
+  left: 20px;
+  width: 28px;
+}
+#ContentsWrapper #header-wrapper .btn_back > img {
+  width: 100%;
+}
+
+/* 헤더 제목 */
+#ContentsWrapper #header-wrapper .header-subject {
+  position: absolute;
+  top: 16px;
+  left: 60px;
+
+  height: 14px;
+  color: #374b17;
+  font-family: AppleSystemUIFont;
+  font-size: 14px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  text-align: left;
+}
+
+/* 예약취소하기 버튼 */
+#ContentsWrapper #header-wrapper .btn-cancel {
+  padding: 3px 11px;
+  position: absolute;
+  top: 11px;
+  right: 20px;
+
+  border-radius: 5px;
+  background-color: #e2e2e2;
+  cursor: pointer;
+}
+
+/* 컨텐츠 영역 */
+#ContentsWrapper .articles .login-wrapper {
+  padding: 9.6px 20px;
+}
+
+#ContentsWrapper .articles .login-wrapper .btn_note {
+  height: 25.6px;
+}
+
+#ContentsWrapper .articles .login-wrapper .btn_note > img {
+  height: 100%;
+}
+
+#ContentsWrapper .articles .login-wrapper .header-split {
+  margin: 12px 0 0 0;
+
+  font-size: 14px;
+  font-weight: normal;
+  text-align: left;
+  color: #767676;
+  font-family: "Noto Sans KR", sans-serif;
+}
+
+#ContentsWrapper .articles .login-wrapper .header-split > p {
+  margin: 0 0 0 0;
+}
+
+/* 오류메세지 */
+div.articles div.error {
+  font-size: 12px;
+  margin: 0 0 0 0;
+  padding: 2px 0 0 8px;
+  background: url(/images/board/icon_note.gif) 0 50% no-repeat;
+  float: left;
+}
+
+div.articles div.error strong {
+  color: #e72905;
+}
+
+/*******************************************************************************************/
+/*  컨텐츠 설정 종료
+/*******************************************************************************************/
+
+@media (min-width: 768px) {
+  #ContentsWrapper {
+    width: 420px;
+    background-color: #f1f1f1;
+    background-repeat: no-repeat;
+    background-position: 50% 100%;
+    height: 100%;
+    margin: 0 auto;
+    background-size: 100% auto;
+  }
+
+  #ContentsWrapper #header-wrapper {
+    width: 380px;
+  }
+}
+@media (max-width: 767px) and (min-width: 320px) {
+  #ContentsWrapper {
+    width: 100%;
+    background-color: #f1f1f1;
+    background-repeat: no-repeat;
+    background-position: 50% 100%;
+    height: 100%;
+    margin: 0 auto;
+    background-size: 100% auto;
+    overflow: auto;
+  }
+
+  #ContentsWrapper #header-wrapper {
+    display: block;
+  }
+}

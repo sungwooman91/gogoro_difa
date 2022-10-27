@@ -102,3 +102,14 @@ dist
 
 # TernJS port file
 .tern-port
+
+# user confing
+/.vscode
+/bak
+/bak_pages_221024
+/web.config 
+/.env
+
+# prisma DB setting
+/prisma
+
