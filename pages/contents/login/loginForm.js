@@ -25,7 +25,8 @@ const Logintest = (props) => {
   const [userPhone, setUserPhone] = useState("");
   const [authState, setAuthState] = useState(false);
   const [nameError, setNameError] = useState(false);
-  // 이름 입력 state
+  // [사용자 IP 주소 GET]
+  // const [userIp, setUserIp] = useState(props);
   const nameInput = useRef();
   // [휴대전화번호 입력 State]
   const [numError, setNumError] = useState(false);
@@ -154,8 +155,9 @@ const Logintest = (props) => {
         customerSendBit = true;
       }
       // 상태변경 확인
-      console.log("errorStatus", errorStatus);
-      console.log("check", customerSendBit);
+      // console.log("errorStatus", errorStatus);
+      // console.log("check", customerSendBit);
+      // console.log("user IP", props.userIp);
       // errorStatus 상태 체크 후 백엔드로 데이터 전송
       if (!errorStatus) {
         setNameError(false);
@@ -169,20 +171,22 @@ const Logintest = (props) => {
           .post(
             api_address,
             {
-              name: getName,
-              phone_number: userPhoneNum,
+              user_name: getName,
+              user_phone_num: userPhoneNum,
               sms_send_bit: customerSendBit,
+              user_login_ip: props.userIp,
             },
             { withCredentials: true }
           )
           .then((res) => {
             if (res.data.result_code === "OK") {
               console.log("[LOG_SW][response status 인증번호 발송]", res.data.result_code);
-              console.log("[LOG_SW][response data 인증번호 발송]", res.data.login_code);
+              // console.log("[LOG_SW][response data 인증번호 발송]", res.data.login_code);
+              // console.log("[LOG_SW][response data 인증번호 발송 display_add_button]", res.data.display_add_button);
 
               setUserPhone(res.data.user_phone);
-              setAuthState(res.data.display_add_button);
-              alert(`인증번호 [ ${res.data.login_code} ]`);
+              setAuthState(true);
+              // alert(`인증번호 [ ${res.data.login_code} ]`);
               alert("인증 번호가 발송 되었습니다!");
             } else if (res.status === 500) {
               console.log("[LOG_SW] response data : ", res.data);
@@ -221,7 +225,7 @@ const Logintest = (props) => {
         axios
           .post("/api/login/token", {
             user_name: userName,
-            user_phone: getPhoneNum,
+            user_phone_num: getPhoneNum,
             auth_number: authNum,
           })
           .then((res) => {
@@ -336,7 +340,17 @@ const Logintest = (props) => {
                     <span className="subject">본인확인 인증번호</span>
                   </label>
                 </div>
-                <input type="number" id="login_code" name="authNumber" autoComplete="off" placeholder="인증번호 4자리" maxLength={4} onChange={handleAuthNumPress} value={inputAuthValue} inputMode="numeric" />
+                <input
+                  type="number"
+                  id="login_code"
+                  name="authNumber"
+                  autoComplete="off"
+                  placeholder="인증번호 4자리"
+                  maxLength={4}
+                  onChange={handleAuthNumPress}
+                  value={inputAuthValue}
+                  inputMode="numeric"
+                />
                 {authError === true && (
                   <div id="login_code_error" className="error">
                     {msgAuthError}

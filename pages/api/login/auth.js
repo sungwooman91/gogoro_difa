@@ -13,6 +13,7 @@ import prisma from "../../../lib/prisma.js";
 // import { v4 as uuidv4 } from "uuid";
 import { getSession } from "../../../lib/get-session.js";
 import { hasCookie, getCookie } from "cookies-next";
+// import { ScrollRestoration } from "react-router-dom";
 
 export default async function handler(req, res) {
   if (req.method === "POST") {
@@ -54,6 +55,7 @@ export default async function handler(req, res) {
 
       //쿠키가 있음.
       if (getUserUUID) {
+        console.log("cookie check :: ", getUserUUID);
         // 토큰값으로 고객정보 조회
         const getUserToken = await getUserLoginToken(getUserUUID);
         // 토큰으로 고객이 있으면
@@ -85,6 +87,7 @@ export default async function handler(req, res) {
             session.Admin_UserEmail = getUserToken.EMAIL;
             session.Admin_TelNo = getUserToken.TEL_NO;
             session.Admin_Memo = getUserToken.MEMO;
+            session.Admin_Regist_Ip = getUserToken.REGIST_IP;
             session.Admin_OrderNo = orderCheck[0].ORDER_NO;
             session.commit();
             // console.log("세션 auth", session);
@@ -137,7 +140,8 @@ async function getDataCheck(param) {
   // params ::
   // event_serial, reserv_serial, customer_serial, reservation_type, from_date, to_date, reserv_hour, reserv_min, use_bit, sort_bit, user_name, tel_no, order_no, row_size, current_page, result_code, result_message, total_record
   // 1, 0, 0, null, null, null, null, null, "Y", null, userName, telno, null, 99999, 1
-  const reservData = await prisma.$queryRaw`exec [dbo].[COMMON_RESERVATION_ORDER_Get_List_Check]  ${COMMON_EVENT_SERIAL}, 0, 0, null,null,null,null,null,"Y",null,${USER_NAME},${TEL_NO},null,99999,1, null, null,0;`;
+  const reservData =
+    await prisma.$queryRaw`exec [dbo].[COMMON_RESERVATION_ORDER_Get_List_Check]  ${COMMON_EVENT_SERIAL}, 0, 0, null,null,null,null,null,"Y",null,${USER_NAME},${TEL_NO},null,99999,1, null, null,0;`;
   // console.log("[LOG_SW]Check reservData] ", reservData);
   return reservData;
 }

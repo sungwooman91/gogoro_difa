@@ -21,17 +21,17 @@ export default async function handler(req, res) {
 
     try {
       origin_order_no = req.body.send_order_no.result;
-      console.log(origin_order_no);
+      // console.log(origin_order_no);
       // origin_order_no = origin_order_no.replaceAll("-", "=").replaceAll("_", "/").replaceAll(".", "+");
       let decord_order_no = await aes256DecodeApi(origin_order_no);
 
       // 디코딩된 예약번호
-      console.log("[LOG_SW][kakao body Check] ", req.body.send_order_no);
-      console.log("[LOG_SW][kakao body Check decode] ", decord_order_no.result);
+      // console.log("[LOG_SW][kakao body Check] ", req.body.send_order_no);
+      // console.log("[LOG_SW][kakao body Check decode] ", decord_order_no.result);
       order_no = decord_order_no.trim();
       //
       if (order_no) {
-        console.log("[LOG_SW][Request order_no] ", order_no);
+        // console.log("[LOG_SW][Request order_no] ", order_no);
         // [ 예약 정보 조회 ]
         order_no = order_no;
         const reservList = await getDataOrderNo(order_no);

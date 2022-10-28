@@ -61,6 +61,7 @@ const Registform = () => {
   // [ 페이징 초기 렌더링 예약날짜 데이터 GET ]
   useEffect(() => {
     console.log("timming get reservDate");
+
     const getDataFromServer = async () => {
       try {
         axios.post("/api/reserv/regist/search/reservDate").then((res) => {

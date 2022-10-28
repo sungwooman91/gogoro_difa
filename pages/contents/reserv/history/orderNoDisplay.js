@@ -25,12 +25,10 @@ export default function OrderDetail() {
       try {
         const response = await axios.post("/api/reserv/history/orderNo").then((res) => {
           console.log("[LOG_SW][/contents/reserv/history/orderNoDisplay][resdata] ", res.data);
-          console.log("sw123", res.data);
+          // console.log("sw123", res.data);
           if (res.status === 200) {
             if (res.data.result_code === "00" || res.data.result_code === "OK") {
               // 동적페이지 만들기
-              // router.push("/contents/reserv/history/orderNo");
-              console.log("sw123", res.data);
               setIsOrderNum(res.data.result_order_no);
               setPageState(true);
             } else if (res.data.result_code === "99") {

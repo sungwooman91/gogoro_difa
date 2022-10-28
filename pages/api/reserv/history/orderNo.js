@@ -31,13 +31,10 @@ export default async function handler(req, res) {
           const getDataCheckList = await getDataCheck(process.env.EVENT_SERIAL, getUserName, getTelNo);
           // 시승 예약 정보가 없을때
           if (!(Array.isArray(getDataCheckList) && getDataCheckList.length === 0)) {
-            // console.log("[LOG_SW][Client Login] COMMON_RESERVATION_ORDER_Get_List_Check SERIAL_NUMBER", getDataCheckList);
-            // console.log("[LOG_SW][Client Login] COMMON_RESERVATION_ORDER_Get_List_Check SERIAL_NUMBER", getDataCheckList[0].SERIAL_NUMBER);
+            //
             if (getDataCheckList?.length) {
               const getOrderNum = getDataCheckList[0].ORDER_NO.trim();
-              // console.log("예약번호", getOrderNum);
               // aes256 모듈로 암호화
-              // console.log("예약번호1234", await aes256EncodeApi(getOrderNum));
               getOrderData.result_order_no = await aes256EncodeApi(getOrderNum);
 
               // console.log("예약번호12333", getOrderData.result_order_no);
@@ -84,7 +81,8 @@ async function getDataCheck(eventSerial, userName, telNo) {
   // params ::
   // event_serial, reserv_serial, customer_serial, reservation_type, from_date, to_date, reserv_hour, reserv_min, use_bit, sort_bit, user_name, tel_no, order_no, row_size, current_page, result_code, result_message, total_record
   // 1, 0, 0, null, null, null, null, null, "Y", null, userName, telno, null, 99999, 1
-  const reservData = await prisma.$queryRaw`exec [dbo].[COMMON_RESERVATION_ORDER_Get_List_Check]  ${COMMON_EVENT_SERIAL}, 0, 0, null,null,null,null,null,null,"1",${USER_NAME},${TEL_NO},null,99999,1, null, null,0;`;
+  const reservData =
+    await prisma.$queryRaw`exec [dbo].[COMMON_RESERVATION_ORDER_Get_List_Check]  ${COMMON_EVENT_SERIAL}, 0, 0, null,null,null,null,null,null,"1",${USER_NAME},${TEL_NO},null,99999,1, null, null,0;`;
   // console.log("[LOG_SW]Check reservData] ", reservData);
   return reservData;
 }

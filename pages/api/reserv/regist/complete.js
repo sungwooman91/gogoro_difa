@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import axios from "axios";
 import dayjs from "dayjs";
-import requestIp from "request-ip";
+// import requestIp from "request-ip";
 /**  */
 import { customerInfoCurrentState, commonDataLog, kakaoMessageValue, setReservDataFormat } from "../../../../lib/component/reservData";
 import { getSession } from "../../../../lib/get-session";
@@ -45,7 +45,7 @@ export default async function handler(req, res) {
         // const reservHour = req.body.reserv_hour;
         // Reservation_idx 값 공백 확인
         if (reservId.length !== 0) {
-          const getIP = requestIp.getClientIp(req);
+          const getIP = session.Admin_Regist_Ip;
           const checkReservList = await getDataView(reservId);
           // console.log("[LOG_SW][Check COMMON_RESERVATION_ORDER_Get_List_Check checkReservList] ", checkReservList);
 
@@ -113,7 +113,7 @@ export default async function handler(req, res) {
                         let orderDataLog = commonDataLog;
                         orderDataLog.TABLE_NAME = tableName;
                         orderDataLog.FK_SERIAL = setReservData.SERIAL_NUMBER;
-                        orderDataLog.REGIST_IP = requestIp.getClientIp(req);
+                        orderDataLog.REGIST_IP = session.Admin_Regist_Ip;
                         // 데이터 로그 저장 함수
                         setDataLog(orderDataLog);
                         // 로그 저장 출력 값 생성
@@ -124,12 +124,10 @@ export default async function handler(req, res) {
                       if (setReservData.SERIAL_NUMBER !== 0) {
                         console.log(`SERIAL_NUMBER : ${setReservData.SERIAL_NUMBER}`);
                         // 예약번호 암호화
-                        // const salt = crypto.randomBytes(32).toString("base64");
-                        // const secretOrderNum = crypto.pbkdf2Sync(orderNo, salt, 1, 32, "sha512").toString("base64");
                         let getEncodeOrderData = await aes256EncodeApi(orderNo);
                         console.log("aes256EncodeApi 리턴 complete:::", getEncodeOrderData);
                         // [암호화된 주문번호 문자열 치환/변환]
-                        // secretOrderNum = secretOrderNum?.replaceAll("=", "-").replaceAll("/", "_").replaceAll("+", ".");
+
                         // 암호화된 주문번호
                         reservOrderIdx = getEncodeOrderData;
 
@@ -139,7 +137,19 @@ export default async function handler(req, res) {
                          */
                         const reservDateSplit = setReservData.RESERVATION_DATE.split("-");
                         const userName = customerGetDataView[0].USER_NAME,
-                          reservDate = reservDateSplit[0] + "." + reservDateSplit[1] + "." + reservDateSplit[2] + "(" + getDate(setReservData.RESERVATION_DATE) + ")" + " " + setReservData.RESERVATION_HOUR + ":" + setReservData.RESERVATION_MINUTE,
+                          reservDate =
+                            reservDateSplit[0] +
+                            "." +
+                            reservDateSplit[1] +
+                            "." +
+                            reservDateSplit[2] +
+                            "(" +
+                            getDate(setReservData.RESERVATION_DATE) +
+                            ")" +
+                            " " +
+                            setReservData.RESERVATION_HOUR +
+                            ":" +
+                            setReservData.RESERVATION_MINUTE,
                           reservNum = orderNo;
                         // console.log(`[LOG_SW][SERVER_RESULT_complete] checkpoint : ${reservDate} ${reservDateSplit}`);
                         const url = process.env.URL;
@@ -158,7 +168,7 @@ export default async function handler(req, res) {
                          * getSendKakaoData의 templateCode와 contents의 빈 값을 체크하는 조건
                          */
                         if (getSendKakaoData.templateCode !== null && getSendKakaoData.contents !== null) {
-                          const getIpAddress = requestIp.getClientIp(req);
+                          const getIpAddress = session.Admin_Regist_Ip;
                           /**
                            * kakao 비즈메세지 전송 함수 [ 내부 API 동작]
                                                    
@@ -169,11 +179,11 @@ export default async function handler(req, res) {
                            * const resultMessage = sendKakaoBizAPI(getSendKakaoData, getIpAddress);
                            */
                           // [테스트 진행시 주석]
-                          // const resultMessage = sendKakaoBizAPI(setReservData.SERIAL_NUMBER, getSendKakaoData, getIpAddress);
+                          const resultMessage = sendKakaoBizAPI(setReservData.SERIAL_NUMBER, getSendKakaoData, getIpAddress);
                           // resultMessage
                           // [처리결과 확인]
-                          // console.log("[SERVER_RESULT] 알림톡 전송", resultMessage);
-                          console.log("IP Address 로그확인 ::", getIpAddress);
+                          console.log("[SERVER_RESULT] 알림톡 전송", resultMessage);
+
                           /** SMS 문자 발송 로그 정보 등록 */
                           /** 회사 내부 API 사용시, Log 프로시저 호출 X */
                           // if (resultMessage.sms_result_code === "OK") {

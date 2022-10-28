@@ -33,7 +33,7 @@ export default async function handler(req, res) {
       await axios
         .post(api_address, {
           user_name: getdata.user_name,
-          user_phone: getdata.user_phone,
+          user_phone_num: getdata.user_phone_num,
           auth_number: getdata.auth_number,
         })
         .then((res) => {
@@ -74,6 +74,7 @@ export default async function handler(req, res) {
         session.Admin_UserEmail = getCustomerData.EMAIL;
         session.Admin_TelNo = getCustomerData.TEL_NO;
         session.Admin_Memo = getCustomerData.MEMO;
+        session.Admin_Regist_Ip = getCustomerData.REGIST_IP;
         session.Admin_OrderNo = getCustomerData.ORDER_NO;
         session.commit();
         // [이전 예약 정보 조회]
