@@ -12,15 +12,15 @@ export default async function handler(req, res) {
     try {
       // 기존에는 암호화 된 예약번호로 날라온다. 디코딩해야함
       origin_order_no = req.body.send_order_no;
-      console.log("origin_order_no::: ", origin_order_no);
+      // console.log("origin_order_no::: ", origin_order_no);
       // [복호화 디코드 api 함수]
       const getDecodeData = await aes256DecodeApi(origin_order_no);
-      console.log("getDecodeData 리턴 ::: ", getDecodeData);
+      // console.log("getDecodeData 리턴 ::: ", getDecodeData);
       // 복호화 처리결과에 따른 예약번호 리턴
       order_no = getDecodeData;
       // 디코딩된 예약번호
-      console.log("[LOG_SW][body Check] ", req.body.send_order_no);
-      console.log("[LOG_SW][123body Check decode] ", getDecodeData.result);
+      // console.log("[LOG_SW][body Check] ", req.body.send_order_no);
+      // console.log("[LOG_SW][123body Check decode] ", getDecodeData.result);
 
       // 복호화된 주문번호로 예약 내역 검색
       if (order_no) {
@@ -28,7 +28,7 @@ export default async function handler(req, res) {
         // [ 예약 정보 조회 ]
         order_no = order_no;
         const reservList = await getDataOrderNo(order_no);
-        console.log("[LOG_SW][getDataOrderNo 정보] 예약번호: " + reservList[0].ORDER_NO + " 예약자명: " + reservList[0].USER_NAME);
+        // console.log("[LOG_SW][getDataOrderNo 정보] 예약번호: " + reservList[0].ORDER_NO + " 예약자명: " + reservList[0].USER_NAME);
         // [ 조회된 예약 정보 데이터 파싱 및 QR코드 생성]
         if (Array.isArray(reservList) && reservList.length > 0) {
           // 이전 예약 내역 있을시
@@ -82,6 +82,7 @@ export default async function handler(req, res) {
       console.log(`[LOG_SW][result] 예약 시리얼넘버 : ${reservResultData.serialNumber} 예약번호 : ${reservResultData.orderNum}`);
       console.log(`[LOG_SW][result] 예약자명 : ${reservResultData.userName} 예약일시 : ${reservResultData.orderDate}`);
       console.log(`[LOG_SW][result] 결과메세지 : ${result_message}`);
+      console.log("==================================================================\n");
       return res.status(200).json({ ok: true, code: result_code, message: result_message, reserve_null: reserve_state, reservResultData });
     } catch (err) {
       console.error(err);

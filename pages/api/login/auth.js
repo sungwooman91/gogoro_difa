@@ -20,26 +20,25 @@ export default async function handler(req, res) {
     console.log("======================= path : api/login/auth =========================");
     console.log("================================= req.body ======================================");
     console.log(req.body);
-    console.log("=================================================================================");
-    console.log("\n");
+
     const sendData = {};
     try {
       // 쿠키와 세션이 있으면 사용자 인증을 함.
       let result = req.body.user_login;
       sendData.result = result;
-      console.log("***** login Check *****");
+      // console.log("***** login Check *****");
       let cookieList, getUserUUID, getUserSerial;
 
       // [쿠키 확인]
       const cookieState = hasCookie("DIFA2022", { req, res });
 
       // 해당쿠키가 있는지 확인
-      console.log("cookieState : ", cookieState);
+      // console.log("cookieState : ", cookieState);
       if (cookieState) {
         // 쿠키값 가져오기
         const getCookieData = getCookie("DIFA2022", { req, res });
-        console.log("cookie data : ", getCookieData);
-        console.log("cookieList data : ", cookieList);
+        // console.log("cookie data : ", getCookieData);
+        // console.log("cookieList data : ", cookieList);
         // 쿠키값 분할
         if (getCookieData == undefined) {
           sendData.cookie_result = false;
@@ -63,9 +62,9 @@ export default async function handler(req, res) {
           sendData.result = true;
           // [이전 예약 정보 조회]
           const orderCheck = await getDataCheck(getUserToken);
-          console.log("예약 고객 정보", getUserToken);
-          console.log(`예약한고객정보 이름:${getUserToken.USER_NAME} 번호:${getUserToken.TEL_NO}`);
-          console.log("예약 내역 조회: ", orderCheck[0]);
+          // console.log("예약 고객 정보", getUserToken);
+          // console.log(`예약한고객정보 이름:${getUserToken.USER_NAME} 번호:${getUserToken.TEL_NO}`);
+          // console.log("예약 내역 조회: ", orderCheck[0]);
           // 세션 값 정의
           // 이전예약 내역 체크
           if (Array.isArray(orderCheck) && orderCheck.length === 0) {
@@ -88,7 +87,7 @@ export default async function handler(req, res) {
             session.Admin_Memo = getUserToken.MEMO;
             session.Admin_OrderNo = orderCheck[0].ORDER_NO;
             session.commit();
-            console.log("세션 auth", session);
+            // console.log("세션 auth", session);
           }
         } else {
           sendData.result = false;
@@ -100,6 +99,8 @@ export default async function handler(req, res) {
         sendData.result = false;
       }
       console.log("사용자 인증 결과: ", sendData);
+      console.log("=================================================================================");
+      console.log("\n");
       return res.status(200).json(sendData);
     } catch (err) {
       console.error(err);

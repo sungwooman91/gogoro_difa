@@ -16,9 +16,14 @@ export default async function handler(req, res) {
   if (req.method === "POST") {
     let result = {};
     let getdata = {};
+    console.log("\n");
+    console.log("======================= path : api/login/token =========================");
+    console.log("================================= req.body ======================================");
+    console.log(req.body);
+
     try {
       getdata = req.body;
-      console.log("[LOG_SW][get req.body] :::", getdata);
+      // console.log("[LOG_SW][get req.body] :::", getdata);
 
       // test variant
       // gogoroAPI
@@ -47,7 +52,7 @@ export default async function handler(req, res) {
           console.log("[LOG_SW][ERROR] ", error);
         });
 
-      console.log("[LOG_SW] get from api data : ", result);
+      // console.log("[LOG_SW] get from api data : ", result);
       // 잘못된 로그인 코드 예외 처리
       if (result.code === "99") {
         return res.json(result);
@@ -72,10 +77,12 @@ export default async function handler(req, res) {
         session.Admin_OrderNo = getCustomerData.ORDER_NO;
         session.commit();
         // [이전 예약 정보 조회]
-        console.log("세션 예약완료", session);
+        // console.log("세션 예약완료", session);
       }
       console.log("Result DATA", result);
-      // 세션;
+      console.log("=================================================================================");
+      console.log("\n");
+
       return res.json(result);
     } catch (err) {
       console.error("[LOG_SW_ERROR] ", err);

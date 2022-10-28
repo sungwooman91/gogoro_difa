@@ -39,6 +39,9 @@ export default function App() {
         }
       }
     });
+
+    // 버그 수정 페이지 이동
+    // router.push("/contents/reserv/regist");
   };
   /** 시승 행사 안내 페이지 이동 처리 콜백 함수 */
   const eventGuideHandler = (e) => {

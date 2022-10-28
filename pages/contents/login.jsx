@@ -16,7 +16,6 @@ import { useRouter } from "next/router";
 import LoginForm from "./login/loginForm";
 // css
 import { style } from "../../lib/component/layout/login";
-import { deleteCookie } from "cookies-next";
 
 export default function LoginFormGogoro() {
   const router = useRouter();
@@ -25,47 +24,47 @@ export default function LoginFormGogoro() {
   // const [isOrder, setIsOrder] = useState(false);
   // 로그인 확인여부
   useEffect(() => {
-    const getLoginStatus = () => {
-      // 로그인 화면으로 넘어올떄 무조건 쿠키 삭제
-      // deleteCookie("DIFA2022");
-      // deleteCookie("SessionSid");
-      // 로그인 상태 변수
-      // const loginState = false;
-      // 로그인 검사
-      // axios
-      //   .post("/api/login/auth", {
-      //     user_login: loginState,
-      //   })
-      //   .then((res) => {
-      //     // console.log("login api 확인", res.status);
-      //     console.log("login api ", res.data);
-      //     const loginCheck = res.data.result;
-      //     const orderCheck = res.data.order_check;
-      //     if (loginCheck) {
-      //       // 로그인 상태값 true로 변경
-      //       console.log("orderCheck api ", orderCheck);
-      //       // 이전 주문내용이 있으면
-      //       if (orderCheck) {
-      //         router.push("/contents/reserv/history/orderNo");
-      //         setIsLogin(true);
-      //       }
-      //       //없으면
-      //       else {
-      //         router.push("/contents/reserv/regist");
-      //       }
-      //     } else {
-      //       // 로그인 페이지 보여줌
-      //       setIsLogin(true);
-      //     }
-      //   })
-      //   .catch((e) => {
-      //     deleteCookie("DIFA2022");
-      //     alert("시스템 오류로 인해 해당 서비스가 실행되지 않습니다.\n\n\t시스템 개발사에 문의 해 주세요.");
-      //     console.log("something went wrong :(", e);
-      //     router.push("/");
-      //   });
-    };
-    getLoginStatus();
+    // const getLoginStatus = () => {
+    //   // 로그인 화면으로 넘어올떄 무조건 쿠키 삭제
+    //   // deleteCookie("DIFA2022");
+    //   // deleteCookie("SessionSid");
+    //   // 로그인 상태 변수
+    //   const loginState = false;
+    //   // 로그인 검사
+    //   axios
+    //     .post("/api/login/auth", {
+    //       user_login: loginState,
+    //     })
+    //     .then((res) => {
+    //       // console.log("login api 확인", res.status);
+    //       console.log("login api ", res.data);
+    //       const loginCheck = res.data.result;
+    //       const orderCheck = res.data.order_check;
+    //       if (loginCheck) {
+    //         // 로그인 상태값 true로 변경
+    //         console.log("orderCheck api ", orderCheck);
+    //         // 이전 주문내용이 있으면
+    //         if (orderCheck) {
+    //           router.push("/contents/reserv/history/orderNo");
+    //           setIsLogin(true);
+    //         }
+    //         //없으면
+    //         else {
+    //           router.push("/contents/reserv/regist");
+    //         }
+    //       } else {
+    //         // 로그인 페이지 보여줌
+    //         setIsLogin(true);
+    //       }
+    //     })
+    //     .catch((e) => {
+    //       deleteCookie("DIFA2022");
+    //       alert("시스템 오류로 인해 해당 서비스가 실행되지 않습니다.\n\n\t시스템 개발사에 문의 해 주세요.");
+    //       console.log("something went wrong :(", e);
+    //       router.push("/");
+    //     });
+    // };
+    // getLoginStatus();
   }, []);
   /** 페이지 이동  */
   const backToPageHandler = () => {

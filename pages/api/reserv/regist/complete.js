@@ -20,8 +20,7 @@ export default async function handler(req, res) {
     console.log("======================= path : api/reserv/regist/complete =======================");
     console.log("================================= req.body ======================================");
     console.log(req.body);
-    console.log("=================================================================================");
-    console.log("\n");
+
     // 쿠키확인
     const isAdmin = hasCookie("DIFA2022", { req, res });
     // [세션 확인]
@@ -36,10 +35,10 @@ export default async function handler(req, res) {
         // [ GET 예약 가능한 날짜 ]
         const getUserName = session.Admin_UserName;
         const getTelNo = session.Admin_TelNo;
-        console.log("[LOG_SW][Check Session] ", getUserName, getTelNo);
+        // console.log("[LOG_SW][Check Session] ", getUserName, getTelNo);
         // 예약 시리얼 넘버
         const reservId = req.body.reserv_id;
-        console.log("[LOG_SW] reservId ", reservId);
+        // console.log("[LOG_SW] reservId ", reservId);
         // 예약 날짜
         // const reservDate = req.body.reserv_date;
         // 예약 시간
@@ -169,14 +168,16 @@ export default async function handler(req, res) {
                            * 회사 내부 API 사용 함수 :: sendKakaoBizAPI (현재사용)
                            * const resultMessage = sendKakaoBizAPI(getSendKakaoData, getIpAddress);
                            */
-                          const resultMessage = sendKakaoBizAPI(setReservData.SERIAL_NUMBER, getSendKakaoData, getIpAddress);
+                          // [테스트 진행시 주석]
+                          // const resultMessage = sendKakaoBizAPI(setReservData.SERIAL_NUMBER, getSendKakaoData, getIpAddress);
+                          // resultMessage
                           // [처리결과 확인]
                           // console.log("[SERVER_RESULT] 알림톡 전송", resultMessage);
-
+                          console.log("IP Address 로그확인 ::", getIpAddress);
                           /** SMS 문자 발송 로그 정보 등록 */
                           /** 회사 내부 API 사용시, Log 프로시저 호출 X */
-                          if (resultMessage.sms_result_code === "OK") {
-                            /**
+                          // if (resultMessage.sms_result_code === "OK") {
+                          /**
                              * 와일드샷 API 사용 시, 문자 발송 로그 사용해야함.
                              * [SMS 문자 발송 LOG정보 초기화 설정]
                              * const sendLog = setLogData(setReservationOrder.SERIAL_NUMBER, getSendKakaoData, resultMessage, getIpAddress);
@@ -184,8 +185,8 @@ export default async function handler(req, res) {
                              * [SMS 문자 발송 LOG 정보 저장]
                              * sendSmsLogData(sendLog);                             
                              */
-                            // console.log("[LOG_SW][SERVER_RESULT] sendSmsLogData", sendLog.FK_SERIAL);
-                          }
+                          // console.log("[LOG_SW][SERVER_RESULT] sendSmsLogData", sendLog.FK_SERIAL);
+                          // }
                         }
                       }
                       // [ 처리결과 설정 ]
@@ -204,7 +205,7 @@ export default async function handler(req, res) {
                   } else {
                     result_code = "NO";
                     result_message = "선택하신 시간에는 시승 예약을 할 수 없습니다. ";
-                    // console.log(`[SERVER_RESULT]_RESULT_CODE : ${result_code} _RESULT_MESSAGE : ${result_message}`);
+                    console.log(`[SERVER_RESULT]_RESULT_CODE : ${result_code} _RESULT_MESSAGE : ${result_message}`);
                   }
                 } else {
                   result_code = "NO";
@@ -224,7 +225,7 @@ export default async function handler(req, res) {
           }
         } else {
           result_code = "NO";
-          result_message = "분을 선택해주세요";
+          result_message = "예약 시간을 정확하게 입력해주세요!!";
           // console.log(`[SERVER_RESULT]_RESULT_CODE : ${result_code} _RESULT_MESSAGE : ${result_message}`);
         }
         // [회원 로그인 확인]
@@ -233,7 +234,9 @@ export default async function handler(req, res) {
         result_message = "사용자 인증 후 시승예약이 가능합니다.";
         // console.log(`[SERVER_RESULT]_RESULT_CODE : ${result_code} _RESULT_MESSAGE : ${result_message}`);
       }
-
+      console.log(`result :: ok: true, code: ${result_code}, message: ${result_message}, keyword: ${result_keyword}, orderNo: ${result_order_no}`);
+      console.log("=================================================================================");
+      console.log("\n");
       return res.status(200).json({ ok: true, code: result_code, message: result_message, keyword: result_keyword, orderNo: result_order_no });
     } catch (err) {
       console.error(err);
@@ -350,8 +353,8 @@ async function sendKakaoBizAPI(fk_serial, getDataFormat, regist_IP) {
     .then((response) => {
       // sms 로그 객체
       if (response.data.result_code === "00") {
-        console.log("[LOG_SW][Check getLog] 메세지 전송 성공");
-        console.log("[LOG_SW][Check getLog] ", response.data);
+        // console.log("[LOG_SW][Check getLog] 메세지 전송 성공");
+        // console.log("[LOG_SW][Check getLog] ", response.data);
         setResult.sms_result_code = "OK";
         setResult.sms_result_message = response.data.result_message;
         setResult.code = response.data.code;

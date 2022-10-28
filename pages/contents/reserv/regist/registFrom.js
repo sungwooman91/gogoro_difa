@@ -7,20 +7,27 @@
 /*  위    치 : /contents/reserv/regist/registFrom.js
 /*******************************************************************************************/
 
+// 페이지 이동 모듈
 import { useRouter } from "next/router";
+// 변수 상태관리 및 초기 설정을 위한 리액트 훅
 import { useEffect, useState } from "react";
 import axios from "axios";
+// css
 import { style } from "../../../../lib/component/layout/regist";
+// 팝업 컴포넌트
 import AgreeRide from "./agreeRidePopup";
 import AgreeInfo from "./agreeInfoPopup";
 import Modal from "react-modal";
+// 현재 시간 및 날짜 계산 모듈
 import { getToDate, getToday } from "../../../../common/lib";
-// import { getCookie } from "cookies-next";
 
 const Registform = () => {
-  // [유효성 상태]
+  /** 1. 에러메세지 */
+  // [1-1.유효성 상태]
   const [hasError, setHasError] = useState(false);
+  // [1-2. 시승차이용약관동의 입력 에러메세지 상태]
   const [rideBoxError, setRideBoxError] = useState(false);
+  // [1-3. 개인정보활용동의 입력 에러메세지 상태]
   const [infoBoxError, setInfoBoxError] = useState(false);
 
   // [예약 날짜 선택 상태]
@@ -84,20 +91,19 @@ const Registform = () => {
     getDataFromServer();
   }, []);
 
-  // [ 예약 날짜 정보 표시 Handler ]
+  // [ 1-1. 예약 날짜 정보 표시 Handler ]
   const onChangeDateHandler = async (event) => {
     const date = event.target.value.split("-");
     console.log("date:::", date);
     // 날짜 전체 입력
     setGetFullDate(event.target.value);
-
+    // 날짜,시간,분 선택 값 초기화
     setGetDate(date[2]);
     setGetHour("");
     setGetMinute("");
     // 시간 선택 리스트 초기화
     setHourList([]);
-    // 날짜, 시간, 분 선택 박스 상태값
-    setIsHour(false);
+    // 날짜, 시간, 분 선택 박스 상태값 초기화
     setIsMinute(false);
     setIsSubmit(false);
     setReservId(null);
@@ -119,7 +125,7 @@ const Registform = () => {
     }
   };
 
-  /** 예약 시간 정보 표시 Handler  */
+  // [ 1-2. 예약 시간 정보 표시 Handler ]
   const onChangeHourHandler = async (event) => {
     console.log("hour:: ", hourList);
     console.log("Minute:: ", minuteList);
@@ -151,7 +157,7 @@ const Registform = () => {
     }
   };
 
-  // [ 예약 분 정보 표시 Handler ]
+  // [ 1-3 예약 분 정보 표시 Handler ]
   const onChangeMinuteHandler = (event) => {
     console.log("분체크:: ", event.target.value);
     for (let index = 0; index < minuteList.length; index++) {
@@ -159,33 +165,44 @@ const Registform = () => {
       if (minuteList[index].RESERVATION_MINUTE === event.target.value) {
         setGetMinute(event.target.value);
         setReservId(`comm_reservation_idx_${minuteList[index].SERIAL_NUMBER}`);
+        break;
       }
     }
     setIsSubmit(true);
-    console.log("reservId:: ", reservId);
+    // console.log("reservId:: ", reservId);
   };
 
+  // 시승차이용약관 동의 변경시 전환 기능
   useEffect(() => {
     if (rideCheck === true) {
       setOnClick(false);
+      setRideBoxError(false);
+      // 시승차이용약관 동의 에러메세지 상태 변경
     } else if (rideCheck === false) {
+      // 시승차이용약관 동의 에러메세지 상태 변경
       setOnClick(false);
+      setRideBoxError(false);
     }
   }, [rideCheck]);
 
+  // 개인정보활용 동의 변경시 전환 기능
   useEffect(() => {
     if (infoCheck === true) {
       setOnClickSecond(false);
+      setInfoBoxError(false);
+      // setInfoBoxError(true);
     } else if (infoCheck === false) {
       setOnClickSecond(false);
+      setInfoBoxError(false);
     }
   }, [infoCheck]);
 
   // [약관 동의 1]
   const doAgreePopupEvent = (e) => {
     setOnClick(true);
-    setHasError(false);
     setRideCheck("");
+    // 에러상태 관리
+    setHasError(false);
   };
   const onClickHandler = (value) => {
     setRideCheck(value);
@@ -195,8 +212,9 @@ const Registform = () => {
   // [약관 동의 2]
   const doAgreeSecondPopupEvent = (e) => {
     setOnClickSecond(true);
-    setHasError(false);
     setInfoCheck("");
+    // 에러상태 관리
+    setHasError(false);
   };
 
   const onClickSecondHandler = (value) => {
@@ -209,90 +227,102 @@ const Registform = () => {
     console.log("등록할 예약 넘버 : ", reservId);
 
     // 오류메세지 초기화
-    let message = "필수 입력항목을 확인 해 주세요.";
+    let message = `필수 입력항목을 확인 해 주세요.`;
     let inputErrorMessage = "입력 양식을 확인 해 주세요.";
-    let confirm = "선택하신 예약정보로 시승 예약 하시겠습니까?";
+
     // 입력폼 유효성 검사 (시승차 이용 약관 동의)
     if (!rideCheck) {
       setHasError(true);
       setRideBoxError(true);
-      errorState = true;
-      alert("시승차 이용 약관 동의 체크해주세요!");
-      return;
+
+      // if (!infoBoxError) alert("시승차 이용 약관 동의 체크해주세요!\n", message);
     }
     // 입력폼 유효성 검사 (개인정보 활용 동의)
     if (!infoCheck) {
       setHasError(true);
       setInfoBoxError(true);
-      errorState = true;
-      alert("개인정보 활용 동의를 체크해주세요!");
-      return;
+
+      // alert("개인정보 활용 동의를 체크해주세요!\n", message);
     }
     // 입력폼 유효성 검사 (날짜 정보 입력유무)
     if (!isDate) {
       setHasError(true);
-      errorState = true;
-      alert("시승차 이용 약관 동의 체크해주세요!");
-      return;
+      // errorState = true;
     }
     // 입력폼 유효성 검사 (시간 정보 입력유무)
     if (!isHour) {
       setHasError(true);
-      errorState = true;
-      return;
+      // errorState = true;
     }
     // 입력폼 유효성 검사 (분 정보 입력유무)
     if (!isMinute) {
       setHasError(true);
-      errorState = true;
-      return;
+      // errorState = true;
     }
-    //
-    if (!errorState) {
-      console.log("send complete");
-      if (reservId !== null) {
-        try {
-          await axios
-            .post("/api/reserv/regist/complete", {
-              reserv_id: reservId,
-              date: getDate,
-              reserv_date: getFullDate,
-              reserv_hour: getHour,
-              reserv_minute: getMinute,
-            })
-            .then((res) => {
-              if (res.status === 200) {
-                console.log("[LOG_SW][response Hour] ", res.data);
-                if (res.data.code === "00" || res.data.code === "OK") {
-                  // 동적페이지 만들기
-                  alert(res.data.message);
-                  router.push("/contents/reserv/history/orderNo");
-                } else if (res.data.code === "99") {
-                  alert(res.data.message);
-                  router.push("/contents/login");
-                } else if (res.data.code === "88") {
-                  alert(res.data.message);
-                  router.push("/contents/reserv/history/orderNo");
-                } else {
-                  alert(res.data.message);
-                }
-              }
-            });
-        } catch (e) {
-          console.log(e);
-          alert("시스템 오류로 인해 해당 서비스가 실행되지 않습니다.\n\t시스템 개발사에 문의 해 주세요.");
+    // 예약 승인 확인 처리
+    let isConfirm = false;
+    const confirm = "선택하신 예약정보로 시승 예약 하시겠습니까?";
+    if (window.confirm(confirm)) {
+      isConfirm = true;
+
+      //
+      if (!hasError) {
+        console.log("send complete");
+        // console.log("수정처리...");
+        if (reservId !== null) {
+          //
+          if (isConfirm) {
+            try {
+              await axios
+                .post("/api/reserv/regist/complete", {
+                  reserv_id: reservId,
+                  date: getDate,
+                  reserv_date: getFullDate,
+                  reserv_hour: getHour,
+                  reserv_minute: getMinute,
+                })
+                .then((res) => {
+                  if (res.status === 200) {
+                    console.log("[LOG_SW][response 예약하기 버튼 처리] ", res.data);
+                    if (res.data.code === "00" || res.data.code === "OK") {
+                      // 동적페이지 만들기
+                      alert(res.data.message);
+                      router.push("/contents/reserv/history/orderNo");
+                    } else if (res.data.code === "99") {
+                      alert(res.data.message);
+                      router.push("/contents/login");
+                    } else if (res.data.code === "88") {
+                      alert(res.data.message);
+                      router.push("/contents/reserv/history/orderNo");
+                    } else {
+                      alert(res.data.message);
+                    }
+                  }
+                });
+            } catch (e) {
+              console.log(e);
+              alert("시스템 오류로 인해 해당 서비스가 실행되지 않습니다.\n\t시스템 개발사에 문의 해 주세요.");
+            }
+          } else {
+            return;
+          }
+        } else {
+          alert("필수 입력항목을 확인 해 주세요!");
         }
       } else {
-        alert("필수 입력항목을 확인 해 주세요!");
+        // switch:
+
+        alert(message);
       }
     } else {
-      alert("예약 시간을 정확하게 입력해주세요.");
+      console.log("[LOG_SW][시승예약 유지]");
+      return;
     }
     //
   };
 
   /** 예약 요일 선택 박스 생성 */
-  const setDateView = daysList && (
+  const setDateView = isHour && (
     <>
       {daysList.map((date, index) => (
         <span key={index}>
@@ -304,7 +334,7 @@ const Registform = () => {
     </>
   );
   /** 예약 시간 선택 박스 생성 */
-  const setHourView = daysList && (
+  const setHourView = isHour && (
     <>
       {hourList.map((data, index) => (
         <span key={index}>
@@ -317,7 +347,7 @@ const Registform = () => {
   );
 
   /** 예약 시간/분 선택 박스 생성 */
-  const setMinuteView = hourList && (
+  const setMinuteView = isHour && (
     <>
       {minuteList.map((date, index) => (
         <span key={index}>
@@ -387,7 +417,7 @@ const Registform = () => {
                   {setHourView}
                 </div>
               )}
-              {Array.isArray(daysList) === true && <div id="option-reserv-hour">예약가능한 시간이 없습니다.</div>}
+              {isHour === false && <div id="option-reserv-hour">예약가능한 시간이 없습니다.</div>}
               {/* <div id="reservation_date_error" className="error">
               <strong>날짜</strong>를 선택 해 주세요.
             </div> */}

@@ -21,21 +21,22 @@ import { style } from "../../../lib/component/layout/regist";
 const Regist = () => {
   // [ 페이지 초기화 ]
   const router = useRouter();
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLogin, setIsLogin] = useState(false);
 
   /**
    * 로그인 확인여부 useEffect
    * api/login/check 에서 로그인 상태를 쿠키와 세션값으로 확인 후 결과 처리
    */
   useEffect(() => {
-    const getLoginStatus = () => {
-      // 로그인 화면으로 넘어올떄 무조건 쿠키 삭제
-      // deleteCookie("DIFA2022");
-      // deleteCookie("SessionSid");
-      console.log("login api ");
+    console.log("login api ");
+    const getRegistStatus = async () => {
+      //   // 로그인 화면으로 넘어올떄 무조건 쿠키 삭제
+      //   // deleteCookie("DIFA2022");
+      //   // deleteCookie("SessionSid");
+
       const loginState = false;
-      // 로그인 검사
-      axios
+      //   // 로그인 검사
+      await axios
         .post("/api/login/auth", {
           user_login: loginState,
         })
@@ -50,15 +51,19 @@ const Regist = () => {
             // 이전 주문내용이 있으면
             if (orderCheck) {
               router.push("/contents/reserv/history/orderNo");
+              // setIsLogin(true);
+            } else {
+              // 로그인 페이지 보여줌
               setIsLogin(true);
             }
             //없으면
             // else {
             //   router.push("/contents/reserv/regist");
             // }
-          } else {
-            // 로그인 페이지 보여줌
-            setIsLogin(true);
+          } // 인증 안되어있으면 메인페이지
+          else {
+            alert("사용자 인증 후 시승예약이 가능합니다.");
+            router.push("/contents/login");
           }
         })
         .catch((e) => {
@@ -67,8 +72,8 @@ const Regist = () => {
           console.log("something went wrong :(", e);
           router.push("/");
         });
-      getLoginStatus();
     };
+    getRegistStatus();
   }, []);
 
   // 페이지 뒤로 가기
@@ -96,37 +101,35 @@ const Regist = () => {
         <title>:: 고고로 시승행사 예약 ::</title>
       </Head>
       <div id="ContentsWrapper">
-        {isLogin === true && (
-          <div id="MainContents">
-            <div className="contents-wrap">
-              <div id="header-wrapper">
-                <span className="btn_back" onClick={backToPageHandler}>
-                  <img src="/images/contents/icon_back.png" alt="뒤로가기" />
-                </span>
-                <span className="header-subject" onClick={backToPageHandler}>
-                  이전화면
-                </span>
-                <span className="btn-cancel" onClick={reservCancel}>
-                  예약취소하기
-                </span>
-              </div>
-              <div className="articles">
-                <div className="reserv-wrapper">
-                  <div className="btn_note">
-                    <img src="/images/contents/icon_note.png" alt="시승예약 입력" />
-                  </div>
-                  <div className="subject">
-                    <h2 className="subject">시승예약</h2>
-                  </div>
-                  <div className="header-split">
-                    <p>아래의 내용에 따라 약관을 읽으신 후 날짜와 시간, 분을 선택하시면 예약을 진행 하실 수 있습니다.</p>
-                  </div>
-                  <Registform className="reserv-wrap" />
+        <div id="MainContents">
+          <div className="contents-wrap">
+            <div id="header-wrapper">
+              <span className="btn_back" onClick={backToPageHandler}>
+                <img src="/images/contents/icon_back.png" alt="뒤로가기" />
+              </span>
+              <span className="header-subject" onClick={backToPageHandler}>
+                이전화면
+              </span>
+              <span className="btn-cancel" onClick={reservCancel}>
+                예약취소하기
+              </span>
+            </div>
+            <div className="articles">
+              <div className="reserv-wrapper">
+                <div className="btn_note">
+                  <img src="/images/contents/icon_note.png" alt="시승예약 입력" />
                 </div>
+                <div className="subject">
+                  <h2 className="subject">시승예약</h2>
+                </div>
+                <div className="header-split">
+                  <p>아래의 내용에 따라 약관을 읽으신 후 날짜와 시간, 분을 선택하시면 예약을 진행 하실 수 있습니다.</p>
+                </div>
+                {isLogin === true && <Registform className="reserv-wrap" />}
               </div>
             </div>
           </div>
-        )}
+        </div>
       </div>
       <style jsx>{style}</style>
     </>

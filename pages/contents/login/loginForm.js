@@ -176,18 +176,17 @@ const Logintest = (props) => {
             { withCredentials: true }
           )
           .then((res) => {
-            if (res.status === 200) {
-              console.log("[LOG_SW] response status : ", res.status);
-              console.log("[LOG_SW] response data : ", res.data);
+            if (res.data.result_code === "OK") {
+              console.log("[LOG_SW][response status 인증번호 발송]", res.data.result_code);
+              console.log("[LOG_SW][response data 인증번호 발송]", res.data.login_code);
 
               setUserPhone(res.data.user_phone);
               setAuthState(res.data.display_add_button);
-              // setUserAuth(res.data.auth_number);
+              alert(`인증번호 [ ${res.data.login_code} ]`);
               alert("인증 번호가 발송 되었습니다!");
             } else if (res.status === 500) {
               console.log("[LOG_SW] response data : ", res.data);
             }
-            // console.log("[LOG_SW] res status : ", res);
           })
           .catch((error) => {
             console.log("[LOG_SW][ERROR] ", error);
@@ -226,34 +225,34 @@ const Logintest = (props) => {
             auth_number: authNum,
           })
           .then((res) => {
-            console.log("[LOG_SW] [response status]", res.status);
-            if (res.status === 200) {
-              console.log("[LOG_SW] [response data]", res.data);
+            console.log("[LOG_SW][response status 인증번호 확인(사용자등록)]", res.data.code);
+            // if (res.status === 200) {
+            // console.log("[LOG_SW][response data 인증번호 확인(사용자등록)]", res.data.login_code);
 
-              if (res.data.code === "OK" || res.data.code === "00") {
-                // 조회되었습니다?
-                console.log("[LOG_SW] 예약 정보 입력 페이지로 이동");
-                // 쿠키 생성
-                if (!hasCookie("DIFA2022")) {
-                  const cookieOptions = { maxAge: 60 * 60 * 6 };
-                  setCookie("DIFA2022", res.data.cookieValue, cookieOptions);
-                }
-                alert("로그인 되었습니다.");
-                //
-                router.push("/contents/reserv/regist");
-              } else if (res.data.code === "88") {
-                alert(res.data.message);
-                router.push("/contents/reserv/history/orderNo");
-              } else if (res.data.code === "NO") {
-                setAuthError(true);
-                setMsgAuthError(res.data.message);
-                alert(res.data.message);
-              } else if (res.data.code === "99") {
-                setAuthError(true);
-                setMsgAuthError(res.data.message);
-                alert(res.data.message);
+            if (res.data.code === "OK" || res.data.code === "00") {
+              // 조회되었습니다?
+              console.log("[LOG_SW] 예약 정보 입력 페이지로 이동");
+              // 쿠키 생성
+              if (!hasCookie("DIFA2022")) {
+                const cookieOptions = { maxAge: 60 * 60 * 6 };
+                setCookie("DIFA2022", res.data.cookieValue, cookieOptions);
               }
+              alert("로그인 되었습니다.");
+              //
+              router.push("/contents/reserv/regist");
+            } else if (res.data.code === "88") {
+              alert(res.data.message);
+              router.push("/contents/reserv/history/orderNo");
+            } else if (res.data.code === "NO") {
+              setAuthError(true);
+              setMsgAuthError(res.data.message);
+              alert(res.data.message);
+            } else if (res.data.code === "99") {
+              setAuthError(true);
+              setMsgAuthError(res.data.message);
+              alert(res.data.message);
             }
+            // }
           })
           .catch((error) => {
             console.log("[LOG_SW][ERROR] ", error);

@@ -20,10 +20,10 @@ export default async function handler(req, res) {
     const getTelNo = session.Admin_TelNo;
     try {
       // [회원 로그인 확인 출력]
-      console.log("path : api/reserv/history/orderNo");
+      // console.log("path : api/reserv/history/orderNo");
 
-      console.log("[LOG_SW][Client Login] 사용자 인증 완료", getUserName);
-      console.log("[LOG_SW][Client Login] 사용자 Result", getTelNo);
+      // console.log("[LOG_SW][Client Login] 사용자 인증 완료", getUserName);
+      // console.log("[LOG_SW][Client Login] 사용자 Result", getTelNo);
       if (isAdmin) {
         // 세션이 없을때, 이름, telno 없을때
         if (getUserName !== undefined && getTelNo !== undefined) {
@@ -32,16 +32,15 @@ export default async function handler(req, res) {
           // 시승 예약 정보가 없을때
           if (!(Array.isArray(getDataCheckList) && getDataCheckList.length === 0)) {
             // console.log("[LOG_SW][Client Login] COMMON_RESERVATION_ORDER_Get_List_Check SERIAL_NUMBER", getDataCheckList);
-            console.log("[LOG_SW][Client Login] COMMON_RESERVATION_ORDER_Get_List_Check SERIAL_NUMBER", getDataCheckList[0].SERIAL_NUMBER);
+            // console.log("[LOG_SW][Client Login] COMMON_RESERVATION_ORDER_Get_List_Check SERIAL_NUMBER", getDataCheckList[0].SERIAL_NUMBER);
             if (getDataCheckList?.length) {
-              console.log("dddddd");
               const getOrderNum = getDataCheckList[0].ORDER_NO.trim();
-              console.log("예약번호", getOrderNum);
+              // console.log("예약번호", getOrderNum);
               // aes256 모듈로 암호화
               // console.log("예약번호1234", await aes256EncodeApi(getOrderNum));
               getOrderData.result_order_no = await aes256EncodeApi(getOrderNum);
 
-              console.log("예약번호12333", getOrderData.result_order_no);
+              // console.log("예약번호12333", getOrderData.result_order_no);
               result_bit = true;
             } else {
               result_bit = false;
