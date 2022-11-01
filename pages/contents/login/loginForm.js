@@ -19,27 +19,25 @@ import { hasCookie, setCookie } from "cookies-next";
 //
 import { handleNextFocus } from "../../../utils/form";
 //
-const Logintest = (props) => {
+const Logintest = ({ userIp }) => {
   // [ 페이지 상태 초기화 ]
   const [userName, setUserName] = useState("");
   const [userPhone, setUserPhone] = useState("");
   const [authState, setAuthState] = useState(false);
   const [nameError, setNameError] = useState(false);
-  // [사용자 IP 주소 GET]
-  // const [userIp, setUserIp] = useState(props);
-  const nameInput = useRef();
+
   // [휴대전화번호 입력 State]
   const [numError, setNumError] = useState(false);
   const msgError = "숫자를 입력하세요! 올바른 형식이 아닙니다.";
-  const [inputValue, setInputValue] = useState("");
   const [inputFirst, setInputFirst] = useState("");
   const [inputSecond, setInputSecond] = useState("");
   const [inputLast, setInputLast] = useState("");
+
   // [인증번호 입력 State]
   const [authError, setAuthError] = useState(false);
   const [msgAuthError, setMsgAuthError] = useState("인증번호는 4자리 숫자로 입력해주세요!");
-
   const [inputAuthValue, setInputAuthValue] = useState("");
+
   // 공백 및 띄어쓰기 비교 변수 설정
   const regexSpacing = /^[^\s]+$/;
 
@@ -56,6 +54,7 @@ const Logintest = (props) => {
     resolver: yupResolver(validationSchema),
     mode: "onChange",
   };
+
   // useForm 초기화 셋팅
   const { register, handleSubmit, getValues, reset, formState } = useForm(formOptions);
   const { errors } = formState;
@@ -85,6 +84,7 @@ const Logintest = (props) => {
 
   // [고객 이름 엘리먼트 포커스 설정]
   useEffect(() => {
+    // setUserIp(getUserIp);
     document.getElementById("user_name").focus();
   }, []);
 
@@ -107,7 +107,7 @@ const Logintest = (props) => {
    * @param {*} event 인증번호 발급 버튼이벤트 클릭 param
    * @returns
    */
-  const getUserIfo = (event) => {
+  const getUserIfo = async (event) => {
     event.preventDefault();
     // 에레 메세지 상태값 초기화
     const totalPhoneNumber = inputFirst + "-" + inputSecond + "-" + inputLast;
@@ -117,12 +117,12 @@ const Logintest = (props) => {
       customerSendBit = false;
 
     // console.log("[LOG_SW] 에러 bit 시작지점 :", errorStatus);
-    console.log("[LOG_SW] 전송 bit 시작지점 :", customerSendBit);
+    // console.log("[LOG_SW] 전송 bit 시작지점 :", customerSendBit);
     if (!event) {
       return;
     } else {
       const getName = getValues().name;
-      console.log("name:::", getName);
+      // console.log("name:::", getName);
       const getTelNum = totalPhoneNumber;
       // 이름 유효성 체크
       if (getName == undefined) {
@@ -144,6 +144,7 @@ const Logintest = (props) => {
           errorStatus = false;
         }
       }
+
       // 휴대 전화 번호 유효성 검사
       const userPhoneNum = getTelNum;
       if (!userPhoneNum.match(/^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/)) {
@@ -151,39 +152,35 @@ const Logintest = (props) => {
         alert("휴대전화번호를 정확히 입력해주세요");
         return;
       } else {
-        // console.log("[LOG_SW] 입력한 휴대전화번호 :", userPhoneNum);
         customerSendBit = true;
       }
-      // 상태변경 확인
-      // console.log("errorStatus", errorStatus);
-      // console.log("check", customerSendBit);
-      // console.log("user IP", props.userIp);
+
+      // 유저 아이피 겟
+      let getUserIp = "";
+      const getip = await axios.get("https://api.ipify.org?format=json");
+      getUserIp = getip.data.ip;
+
       // errorStatus 상태 체크 후 백엔드로 데이터 전송
       if (!errorStatus) {
-        setNameError(false);
+        setNumError(false);
         setNameError(false);
         // 유효성 검사 완료된 이름 state 저장
         setUserName(getName);
-        // gogoroAPI
+        // gogoroAPI;
         const api_address = "http://rentapi.gobikebank.com/v1/login/auth/";
-        // const api_address = "http://localhost:3000/v1/login/auth/";
-        axios
-          .post(
-            api_address,
-            {
-              user_name: getName,
-              user_phone_num: userPhoneNum,
-              sms_send_bit: customerSendBit,
-              user_login_ip: props.userIp,
-            },
-            { withCredentials: true }
-          )
+        // api 서버로 데이터 전송
+        await axios
+          .post(api_address, {
+            user_name: getName,
+            user_phone_num: userPhoneNum,
+            sms_send_bit: customerSendBit,
+            user_login_ip: getUserIp,
+          })
           .then((res) => {
             if (res.data.result_code === "OK") {
               console.log("[LOG_SW][response status 인증번호 발송]", res.data.result_code);
               // console.log("[LOG_SW][response data 인증번호 발송]", res.data.login_code);
               // console.log("[LOG_SW][response data 인증번호 발송 display_add_button]", res.data.display_add_button);
-
               setUserPhone(res.data.user_phone);
               setAuthState(true);
               // alert(`인증번호 [ ${res.data.login_code} ]`);
@@ -221,7 +218,6 @@ const Logintest = (props) => {
       }
       // 유효성 검사가 정확히 끝났을때 전송
       if (!errorStatus) {
-        console.log("To send param nmae ::: ", userName);
         axios
           .post("/api/login/token", {
             user_name: userName,
@@ -230,9 +226,6 @@ const Logintest = (props) => {
           })
           .then((res) => {
             console.log("[LOG_SW][response status 인증번호 확인(사용자등록)]", res.data.code);
-            // if (res.status === 200) {
-            // console.log("[LOG_SW][response data 인증번호 확인(사용자등록)]", res.data.login_code);
-
             if (res.data.code === "OK" || res.data.code === "00") {
               // 조회되었습니다?
               console.log("[LOG_SW] 예약 정보 입력 페이지로 이동");
@@ -241,22 +234,27 @@ const Logintest = (props) => {
                 const cookieOptions = { maxAge: 60 * 60 * 6 };
                 setCookie("DIFA2022", res.data.cookieValue, cookieOptions);
               }
+              // [ 시승 예약화면으로 이동 ]
               alert("로그인 되었습니다.");
-              //
               router.push("/contents/reserv/regist");
-            } else if (res.data.code === "88") {
+            }
+            // [ 시승 예약 내역 화면으로 이동 ]
+            else if (res.data.code === "88") {
               alert(res.data.message);
               router.push("/contents/reserv/history/orderNo");
-            } else if (res.data.code === "NO") {
-              setAuthError(true);
-              setMsgAuthError(res.data.message);
-              alert(res.data.message);
-            } else if (res.data.code === "99") {
+            }
+            // [ 에러메세지 1 ]
+            else if (res.data.code === "NO") {
               setAuthError(true);
               setMsgAuthError(res.data.message);
               alert(res.data.message);
             }
-            // }
+            // [ 에러메세지 2 ]
+            else if (res.data.code === "99") {
+              setAuthError(true);
+              setMsgAuthError(res.data.message);
+              alert(res.data.message);
+            }
           })
           .catch((error) => {
             console.log("[LOG_SW][ERROR] ", error);
@@ -273,8 +271,9 @@ const Logintest = (props) => {
     if (!event) {
       return;
     }
+    // 유효성 검사 모듈 리셋
     reset();
-    setInputValue("");
+    //
     setInputAuthValue("");
     setAuthState("");
     setInputSecond("");
@@ -301,11 +300,9 @@ const Logintest = (props) => {
                 type="text"
                 autoComplete="off"
                 maxLength={8}
-                // initValue={initValue.name}
                 {...register("name", { maxLength: 8 })}
                 className={`form-control ${errors.name ? "is-invalid" : ""}`}
                 disabled={authState}
-                // ref={nameInput}
               />
               {nameError === true && (
                 <div id="user_name_error" className="error">

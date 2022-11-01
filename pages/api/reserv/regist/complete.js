@@ -1,17 +1,16 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import axios from "axios";
 import dayjs from "dayjs";
-// import requestIp from "request-ip";
-/**  */
-import { customerInfoCurrentState, commonDataLog, kakaoMessageValue, setReservDataFormat } from "../../../../lib/component/reservData";
 import { getSession } from "../../../../lib/get-session";
 import { hasCookie } from "cookies-next";
-import { setDataLog, getDataLog } from "../../login/getAuthNum";
-import { getDate, getUserKey } from "../../../../lib/component/common";
 // 암호화 모듈
 import { aes256EncodeApi } from "../../../../common/lib";
 /** db 프로시저 모듈 */
-import { getDataView, getCustomerDataView, getDataCheck, newReservInsert, newReservInsertResult } from "../../../../common/db";
+import { getDataView, getCustomerDataView, getDataCheck, newReservInsert, newReservInsertResult, setDataLog, getDataLog } from "../../../../common/db";
+/**  데이터 테이블 모듈*/
+import { customerInfoCurrentState, commonDataLog, kakaoMessageValue, setReservDataFormat } from "../../../../lib/component/reservData";
+/** 오늘날짜, 유저 키 생성 모듈 */
+import { getDate, getUserKey } from "../../../../lib/component/common";
 
 export default async function handler(req, res) {
   const tableName = "COMMON_RESERVATION_ORDER";

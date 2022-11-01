@@ -28,6 +28,7 @@ export default async function handler(req, res) {
     const isAdmin = hasCookie("DIFA2022", { req, res });
     const session = await getSession(req, res);
     let serial = req.body.serial;
+    let user_ip_address = req.body.user_ip;
     console.log("[LOG_SW][req.body.serial] ", req.body);
     try {
       // []
@@ -52,7 +53,7 @@ export default async function handler(req, res) {
             if (getCancelData[0].STATE_TYPE === "00") {
               // [ 예약 취소 처리]
               // 클라이언트 IP addresss
-              const clientIp = requestIp.getClientIp(req);
+              const clientIp = user_ip_address;
               console.log("[LOG_SW][Client Login] 클라이언트 IP ", clientIp);
               // [예약 취소 함수] serial 번호로 삭제 처리
               await setCancelState(serial, "10", clientIp);
@@ -103,7 +104,7 @@ export default async function handler(req, res) {
                   cancelDataLog.FK_SERIAL = getCancelData[0].SERIAL_NUMBER;
                   cancelDataLog.STATE_TYPE = "U";
                   cancelDataLog.USER_ID = getCancelData[0].USER_NAME;
-                  cancelDataLog.REGIST_IP = requestIp.getClientIp(req);
+                  cancelDataLog.REGIST_IP = user_ip_address;
                   const beforeSummary = beforeState ? `${beforeState} (${getCancelData[0].STATE_TYPE}})▶` : null;
                   const afterSummary = afterState ? `${afterState} (10)` : null;
                   cancelDataLog.SUMMARY = "<strong>처리상태 :</strong><br />&nbsp;" + beforeSummary + afterSummary;

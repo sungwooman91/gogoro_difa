@@ -13,9 +13,9 @@ export default async function handler(req, res) {
     try {
       // [ GET 예약 가능한 날짜 ]
       // const data = await orderGetTime("1", process.env.EVENT_SERIAL, "00", reservDate, reservHour, "Y");
-      const data = await orderGetTimeTest("1", process.env.EVENT_SERIAL, "00", reservDate, reservHour, "Y");
+      const data = await orderGetTime("1", process.env.EVENT_SERIAL, "00", reservDate, reservHour, "Y");
       // 현재 month 값 설정
-      console.log("minute::", data[0]);
+      console.log("minute::", data);
       // console.log("minute22::", data2[0]);
       return res.status(200).json({ ok: true, reserv_result: data });
     } catch (err) {

@@ -10,9 +10,10 @@ export default async function handler(req, res) {
     console.log("\n");
 
     const reservDate = req.body.select_date;
+    const getSerialNum = process.env.EVENT_SERIAL;
     try {
       // [ GET 예약 가능한 날짜 ]
-      const data = await orderGetTime("1", process.env.EVENT_SERIAL, "00", reservDate, "Y");
+      const data = await orderGetTime("1", getSerialNum, "00", reservDate, "Y");
       // 현재 month 값 설정
       // console.log("[LOG_SW][Get COMMON_RESERVATION_Get_Hour]", data);
       return res.status(200).json({ ok: true, reserv_date: data[0], reserv_time: data[1] });
@@ -35,7 +36,7 @@ async function orderGetTime(order_bit, event_serial, reservation_type, reserv_da
 
   const reservData = await prisma.$queryRaw`exec [dbo].[COMMON_RESERVATION_Get_Hour] ${ORDER_BIT}, ${COMMON_EVENT_SERIAL}, ${RESERVATION_TYPE}, ${RESERVATION_DATE}, ${USE_BIT}, null, null;`;
   //   const reservData = [1, 1, 1, 1, 1, 1, 0];
-  // console.log("[LOG_SW][OrderGetTime Results]", reservData);
+  console.log("[LOG_SW][OrderGetTime Results]", reservData);
   if (reservData.length === 0 && Array.isArray(reservData)) {
     console.log("[reserve hour]예약 가능 시간", reservData);
     // 빈배열 체크
@@ -49,11 +50,11 @@ async function orderGetTime(order_bit, event_serial, reservation_type, reserv_da
       // 현재 month 값 설정
       const today = new Date();
       const thisHour = ("0" + today.getHours()).slice(-2);
-      // console.log("[LOG_SW][현재 Hour]", thisHour);
+      console.log("[LOG_SW][현재 Hour]", thisHour);
       // 현재 Hour에 신청가능한 날짜 sort
       for (let index = 0; index < reservData.length; index++) {
         // reservDate 결과값 = [ '2022', '08', '17' ]
-        if (reservData[index].RESERVATION_HOUR) {
+        if (reservData[index].RESERVATION_HOUR >= thisHour) {
           // console.log("[LOG_SW][DB Hour]", reservData[index].RESERVATION_HOUR);
           getTimeData.push(reservData[index].RESERVATION_HOUR);
         }

@@ -153,17 +153,26 @@ export default function OrderInfo({ orderNo }) {
     }
     // 예약 고유번호
     if (isCancel) {
+      // IP 주소 얻기
       try {
+        let getUserIp = "";
+        // 유저 아이피 겟
+        const getip = await axios.get("https://api.ipify.org?format=json");
+        getUserIp = getip.data.ip;
+        // 시리얼 값
+        const send_data = isSerial;
+        // 취소 요청
         const response = await axios
           .post("/api/reserv/cancel/detail", {
-            serial: isSerial,
+            serial: send_data,
+            user_ip: getUserIp,
           })
           .then((res) => {
             if (res.status === 200) {
               if (res.data.code === "00" || res.data.code === "OK") {
                 console.log("[LOG_SW][response Cancel] ", res.data);
-                router.push("/");
                 // [예약 취소 완료] 초기페이지로 돌아가기
+                router.push("/");
               } else if (res.data.code === "99") {
                 router.push("/contents/login");
               }

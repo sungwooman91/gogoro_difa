@@ -17,25 +17,30 @@ import { style } from "../../../../lib/component/layout/regist";
 // 팝업 컴포넌트
 import AgreeRide from "./agreeRidePopup";
 import AgreeInfo from "./agreeInfoPopup";
-import Modal from "react-modal";
 // 현재 시간 및 날짜 계산 모듈
 import { getToDate, getToday } from "../../../../common/lib";
 
 const Registform = () => {
   /** 1. 에러메세지 */
   // [1-1.유효성 상태]
-  const [hasError, setHasError] = useState(false);
+  const [hasError, setHasError] = useState(true);
   // [1-2. 시승차이용약관동의 입력 에러메세지 상태]
   const [rideBoxError, setRideBoxError] = useState(false);
   // [1-3. 개인정보활용동의 입력 에러메세지 상태]
   const [infoBoxError, setInfoBoxError] = useState(false);
 
+  // [ 데이터 수신 체크 ]
+  const [isGetData, setIsGetData] = useState(false);
   // [예약 날짜 선택 상태]
   const router = useRouter();
   const [isDate, setIsDate] = useState(false);
   const [isHour, setIsHour] = useState(false);
   const [isMinute, setIsMinute] = useState(false);
   const [isSubmit, setIsSubmit] = useState(false);
+  // [ 시간 설정 에러메세지 상태 ]
+  const [dateError, setDateError] = useState(false);
+  const [hourError, setHourError] = useState(false);
+  const [minError, setMinError] = useState(false);
 
   // [예약 선택 정보 response ]
   const [daysList, setDaysList] = useState([]);
@@ -69,9 +74,9 @@ const Registform = () => {
             console.log("[LOG_SW][Response result] : ", res.data);
             console.log("[LOG_SW][Response result getDay] : ", getDay);
 
-            // 시간 상태값, 시간 상태값 true 설정
-            setIsDate(true);
-            setIsHour(true);
+            // 시간 상태값
+            setIsGetData(true);
+
             // 현재 진행되는 10월
             setMonthValue(res.data.month);
             //
@@ -108,6 +113,10 @@ const Registform = () => {
     setIsMinute(false);
     setIsSubmit(false);
     setReservId(null);
+    // 에러메시지 초기화
+    setIsDate(true);
+    setDateError(false);
+    setHasError(false);
     /** [axios post 요청 예약 시간 선택 정보 조회] */
     try {
       const response = await axios
@@ -138,6 +147,9 @@ const Registform = () => {
     setIsMinute(false);
     setIsSubmit(false);
     setReservId(null);
+    // 에러메시지 초기화
+    setHourError(false);
+    setHasError(false);
     const getHourValue = event.target.value;
     try {
       const response = await axios
@@ -160,6 +172,8 @@ const Registform = () => {
 
   // [ 1-3 예약 분 정보 표시 Handler ]
   const onChangeMinuteHandler = (event) => {
+    // 에러메시지 초기화
+    setMinError(false);
     console.log("분체크:: ", event.target.value);
     for (let index = 0; index < minuteList.length; index++) {
       console.log(minuteList[index]);
@@ -224,106 +238,94 @@ const Registform = () => {
 
   // [ 예약 등록 정보 전송 submit ]
   const setReservationSubmit = async (event) => {
-    let errorState = false;
+    // let errorState = false;
     console.log("등록할 예약 넘버 : ", reservId);
 
     // 오류메세지 초기화
     let message = `필수 입력항목을 확인 해 주세요.`;
-    let inputErrorMessage = "입력 양식을 확인 해 주세요.";
+    // let inputErrorMessage = "입력 양식을 확인 해 주세요.";
 
     // 입력폼 유효성 검사 (시승차 이용 약관 동의)
     if (!rideCheck) {
-      setHasError(true);
       setRideBoxError(true);
-
-      // if (!infoBoxError) alert("시승차 이용 약관 동의 체크해주세요!\n", message);
     }
     // 입력폼 유효성 검사 (개인정보 활용 동의)
     if (!infoCheck) {
-      setHasError(true);
       setInfoBoxError(true);
-
-      // alert("개인정보 활용 동의를 체크해주세요!\n", message);
     }
     // 입력폼 유효성 검사 (날짜 정보 입력유무)
     if (!isDate) {
+      setDateError(true);
       setHasError(true);
-      // errorState = true;
     }
     // 입력폼 유효성 검사 (시간 정보 입력유무)
     if (!isHour) {
+      setHourError(true);
       setHasError(true);
-      // errorState = true;
     }
     // 입력폼 유효성 검사 (분 정보 입력유무)
     if (!isMinute) {
+      setMinError(true);
       setHasError(true);
-      // errorState = true;
     }
+
     // 예약 승인 확인 처리
     let isConfirm = false;
     const confirm = "선택하신 예약정보로 시승 예약 하시겠습니까?";
-    if (window.confirm(confirm)) {
-      isConfirm = true;
-
+    //
+    if (!hasError && infoCheck && rideCheck) {
       //
-      if (!hasError) {
-        console.log("send complete");
-        // console.log("수정처리...");
-        if (reservId !== null) {
+      if (reservId !== null) {
+        if (window.confirm(confirm)) {
+          console.log("send complete");
           //
-          if (isConfirm) {
-            try {
-              await axios
-                .post("/api/reserv/regist/complete", {
-                  reserv_id: reservId,
-                  date: getDate,
-                  reserv_date: getFullDate,
-                  reserv_hour: getHour,
-                  reserv_minute: getMinute,
-                })
-                .then((res) => {
-                  if (res.status === 200) {
-                    console.log("[LOG_SW][response 예약하기 버튼 처리] ", res.data);
-                    if (res.data.code === "00" || res.data.code === "OK") {
-                      // 동적페이지 만들기
-                      alert(res.data.message);
-                      router.push("/contents/reserv/history/orderNo");
-                    } else if (res.data.code === "99") {
-                      alert(res.data.message);
-                      router.push("/contents/login");
-                    } else if (res.data.code === "88") {
-                      alert(res.data.message);
-                      router.push("/contents/reserv/history/orderNo");
-                    } else {
-                      alert(res.data.message);
-                    }
+          try {
+            await axios
+              .post("/api/reserv/regist/complete", {
+                reserv_id: reservId,
+                date: getDate,
+                reserv_date: getFullDate,
+                reserv_hour: getHour,
+                reserv_minute: getMinute,
+              })
+              .then((res) => {
+                if (res.status === 200) {
+                  console.log("[LOG_SW][response 예약하기 버튼 처리] ", res.data);
+                  if (res.data.code === "00" || res.data.code === "OK") {
+                    // 동적페이지 만들기
+                    alert(res.data.message);
+                    router.push("/contents/reserv/history/orderNo");
+                  } else if (res.data.code === "99") {
+                    alert(res.data.message);
+                    router.push("/contents/login");
+                  } else if (res.data.code === "88") {
+                    alert(res.data.message);
+                    router.push("/contents/reserv/history/orderNo");
+                  } else {
+                    alert(res.data.message);
                   }
-                });
-            } catch (e) {
-              console.log(e);
-              alert("시스템 오류로 인해 해당 서비스가 실행되지 않습니다.\n\t시스템 개발사에 문의 해 주세요.");
-            }
-          } else {
-            return;
+                }
+              });
+          } catch (e) {
+            console.log(e);
+            alert("시스템 오류로 인해 해당 서비스가 실행되지 않습니다.\n\t시스템 개발사에 문의 해 주세요.");
           }
         } else {
-          alert("필수 입력항목을 확인 해 주세요!");
+          return;
         }
       } else {
         // switch:
-
         alert(message);
       }
     } else {
-      console.log("[LOG_SW][시승예약 유지]");
+      alert(message);
       return;
     }
     //
   };
 
   /** 예약 요일 선택 박스 생성 */
-  const setDateView = isHour && (
+  const setDateView = isGetData && (
     <>
       {daysList.map((date, index) => (
         <span key={index}>
@@ -348,7 +350,7 @@ const Registform = () => {
   );
 
   /** 예약 시간/분 선택 박스 생성 */
-  const setMinuteView = isHour && (
+  const setMinuteView = isMinute && (
     <>
       {minuteList.map((date, index) => (
         <span key={index}>
@@ -394,16 +396,18 @@ const Registform = () => {
                 <span className="subject">날짜선택</span>
               </label>
             </div>
-            {isDate === true && <div>{monthValue}</div>}
-            {isDate === true && (
+            {isGetData === true && <div>{monthValue}</div>}
+            {isGetData === true && (
               <div id="option-reserv-date">
                 {/* 날짜 선택 select 박스 영역 */}
                 {setDateView}
               </div>
             )}
-            {/* <div id="reservation_date_error" className="error">
-              <strong>날짜</strong>를 선택 해 주세요.
-            </div> */}
+            {dateError == true && (
+              <div id="reservation_date_error" className="error">
+                <strong>날짜</strong>를 선택 해 주세요.
+              </div>
+            )}
           </div>
           <div id="reserv-step-3" className="reserv-step">
             <div id="reserv-hour-wrap">
@@ -419,9 +423,11 @@ const Registform = () => {
                 </div>
               )}
               {isHour === false && <div id="option-reserv-hour">예약가능한 시간이 없습니다.</div>}
-              {/* <div id="reservation_date_error" className="error">
-              <strong>날짜</strong>를 선택 해 주세요.
-            </div> */}
+              {hourError == true && (
+                <div id="reservation_hour_error" className="error">
+                  <strong>시간</strong>을 선택 해 주세요.
+                </div>
+              )}
             </div>
             {isMinute === true && (
               <div id="reserv-minute-wrap">
@@ -434,9 +440,11 @@ const Registform = () => {
                   {/* 날짜 선택 select 박스 영역 */}
                   {setMinuteView}
                 </div>
-                {/* <div id="reservation_date_error" className="error">
-              <strong>날짜</strong>를 선택 해 주세요.
-            </div> */}
+                {minError == true && (
+                  <div id="reservation_minute_error" className="error">
+                    <strong>분</strong>을 선택 해 주세요.
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -449,15 +457,11 @@ const Registform = () => {
         </form>
       </div>
       {onClick && (
-        <Modal isOpen={true} ariaHideApp={false} style={{ content: { position: "none" } }}>
+        <>
           <AgreeRide onClickHandler={onClickHandler} />
-        </Modal>
+        </>
       )}
-      {onClickSecond && (
-        <Modal isOpen={true} ariaHideApp={false} style={{ content: { position: "none" } }}>
-          <AgreeInfo onClickSecondHandler={onClickSecondHandler} />
-        </Modal>
-      )}
+      {onClickSecond && <AgreeInfo onClickSecondHandler={onClickSecondHandler} />}
       <style jsx>{style}</style>
     </>
   );

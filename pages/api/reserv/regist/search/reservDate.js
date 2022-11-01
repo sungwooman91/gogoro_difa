@@ -8,13 +8,14 @@ export default async function handler(req, res) {
     console.log(req.body);
     console.log("==========================================================================================");
     console.log("\n");
+    const eventSerial = process.env.EVENT_SERIAL;
     // [ 처리결과 설정]
     try {
       // [ GET 예약 가능한 날짜 조회 ]
-      const data = await orderGetDate("0", process.env.EVENT_SERIAL, "00", "Y");
+      const data = await orderGetDate("0", eventSerial, "00", "Y");
       // [ 초기 시간 선택값 생성 ]
-      const initialTimeValue = await initialSelectTime();
-      console.log("[api/reserv/regist/search/reservDate] :::", initialTimeValue);
+      const initialTimeValue = await initialSelectTime(eventSerial);
+      // console.log("[api/reserv/regist/search/reservDate] :::", initialTimeValue);
       // [이번달]
       const today = new Date(),
         thisMonth = ("0" + (today.getMonth() + 1)).slice(-2) + "월";
@@ -52,12 +53,20 @@ async function orderGetDate(order_bit, event_serial, reservation_type, use_bit) 
       let getReservDate = [];
       // 현재 month 값 설정
       const today = new Date();
+      // 현재 일자
+      // console.log("today.getDate :: ", today.getDate().toString());
+
       const thisMonth = ("0" + (today.getMonth() + 1)).slice(-2);
       // 현재 month에 신청가능한 날짜 sort
       for (let index = 0; index < reservData.length; index++) {
         const reservDate = reservData[index].RESERVATION_DATE.split("-");
         // reservDate 결과값 = [ '2022', '08', '17' ]
-        if (thisMonth === reservDate[1]) {
+        /**
+         * 월, 일 일치하는 조건
+         * today.getDate().toString() 은 금일 날짜를 str으로 받는다.
+         * */
+        const getDate = today.getDate().toString();
+        if (thisMonth === reservDate[1] && getDate === reservDate[2]) {
           let dataObject = {};
           const strDate = reservDate.join("");
           const getWeekDate = getDateStr(strDate);
@@ -74,13 +83,13 @@ async function orderGetDate(order_bit, event_serial, reservation_type, use_bit) 
 }
 
 // [ 초기 시간 선택값 생성 ]
-async function initialSelectTime() {
+async function initialSelectTime(event_serial) {
   const thisDay = getToday(),
     today = new Date(),
     thisHour = ("0" + today.getHours()).slice(-2);
-
-  const getInitialTime = await prisma.$queryRaw`exec [dbo].[COMMON_RESERVATION_Get_Hour] "1", 1, "00", ${thisDay}, "Y", null, null;`;
-
+  // console.log("2022-10-28");
+  const getInitialTime = await prisma.$queryRaw`exec [dbo].[COMMON_RESERVATION_Get_Hour] "1", ${event_serial}, "00", ${thisDay}, "Y", null, null;`;
+  // console.log("2022-10-28 ::", getInitialTime);
   let getTimeData = [];
   for (let index = 0; index < getInitialTime.length; index++) {
     if (getInitialTime[index].RESERVATION_HOUR >= thisHour) {

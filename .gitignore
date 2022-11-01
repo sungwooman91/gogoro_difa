@@ -109,7 +109,13 @@ dist
 /bak_pages_221024
 /web.config 
 /.env
+/.next_back_221031
 
 # prisma DB setting
 /prisma
+
+/next.config.js
+/public
+/.styles
+/styles
 

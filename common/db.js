@@ -90,7 +90,8 @@ export async function newReservInsertResult(event_serrial, userName, telNo) {
   // params ::
   // event_serial, reserve_serial, customer_serial, reservation_type, from_date, to_date, reserv_hour, reserv_min, use_bit, sort_bit, user_name, tel_no, order_no, row_size, current_page, result_code, result_message, total_record
   // 1, 0, 0, null, null, null, null, null, "Y", null, userName, telno, null, 99999, 1
-  const reservData = await prisma.$queryRaw`exec [dbo].[COMMON_RESERVATION_ORDER_Get_List]  ${COMMON_EVENT_SERIAL}, 0, 0, "00",null,null,null,null,null,"Y",null,${USER_NAME},${TEL_NO},null,99999,1, null, null,0;`;
+  const reservData =
+    await prisma.$queryRaw`exec [dbo].[COMMON_RESERVATION_ORDER_Get_List]  ${COMMON_EVENT_SERIAL}, 0, 0, "00",null,null,null,null,null,"Y",null,${USER_NAME},${TEL_NO},null,99999,1, null, null,0;`;
   //   console.log(reservData);
   return reservData;
 }
@@ -114,7 +115,8 @@ export async function orderGetTime(order_bit, event_serial, reservation_type, re
     RESERVATION_HOUR = reserv_hour,
     USE_BIT = use_bit;
 
-  const reservData = await prisma.$queryRaw`exec [dbo].[COMMON_RESERVATION_Get_Minute] ${ORDER_BIT}, ${COMMON_EVENT_SERIAL}, ${RESERVATION_TYPE}, ${RESERVATION_DATE},  ${RESERVATION_HOUR}, ${USE_BIT}, null, null;`;
+  const reservData =
+    await prisma.$queryRaw`exec [dbo].[COMMON_RESERVATION_Get_Minute] ${ORDER_BIT}, ${COMMON_EVENT_SERIAL}, ${RESERVATION_TYPE}, ${RESERVATION_DATE},  ${RESERVATION_HOUR}, ${USE_BIT}, null, null;`;
 
   if (reservData.length === 0 && Array.isArray(reservData)) {
     // 빈배열 체크
@@ -150,7 +152,39 @@ export async function orderGetTimeTest(order_bit, event_serial, reservation_type
     RESERVATION_HOUR = reserv_hour,
     USE_BIT = use_bit;
 
-  const reservData = await prisma.$queryRaw`exec [dbo].[COMMON_RESERVATION_Get_Minute] ${ORDER_BIT}, ${COMMON_EVENT_SERIAL}, ${RESERVATION_TYPE}, ${RESERVATION_DATE},  ${RESERVATION_HOUR}, ${USE_BIT}, null, null;`;
+  const reservData =
+    await prisma.$queryRaw`exec [dbo].[COMMON_RESERVATION_Get_Minute] ${ORDER_BIT}, ${COMMON_EVENT_SERIAL}, ${RESERVATION_TYPE}, ${RESERVATION_DATE},  ${RESERVATION_HOUR}, ${USE_BIT}, null, null;`;
 
   return reservData;
+}
+
+// Data Log 저장 함수
+/**
+ * sms 전송 이후 신규 고객이 등록 or 재갱신 됬을때 데이터 로그 기록을 남기는 함수
+ * @param {*} commonDataLog object 타입의 로그 데이터 (db 테이블 명, FK 시리얼 넘버, 유저 아이디, 로그 요약, 등록된 IP 주소)
+ * @returns db에 업데이트가 완료되면 무작위 int 값이 생성
+ */
+export async function setDataLog(commonDataLog) {
+  const TABLE_NAME = commonDataLog.TABLE_NAME,
+    FK_SERIAL = commonDataLog.FK_SERIAL,
+    STATE_TYPE = commonDataLog.STATE_TYPE,
+    USER_ID = commonDataLog.USER_ID,
+    SUMMARY = commonDataLog.SUMMARY,
+    REGIST_IP = commonDataLog.REGIST_IP;
+
+  const dataLog = await prisma.$executeRaw`exec [dbo].[COMMON_DATA_LOG_Set_Insert] ${TABLE_NAME}, ${FK_SERIAL}, ${STATE_TYPE}, ${USER_ID}, ${SUMMARY}, ${REGIST_IP}, null, null, 0;`;
+  return dataLog;
+}
+// Data 로그 Get 함수
+/**
+ * 데이터 로그를 조회 하기 위한 함수
+ * @param {*} commonDataLog 조회할 db 테이블명, FK 시리얼넘버가 등록된 object 입력
+ * @returns
+ */
+export async function getDataLog(commonDataLog) {
+  const TABLE_NAME = commonDataLog.TABLE_NAME,
+    FK_SERIAL = commonDataLog.FK_SERIAL;
+
+  const dataLog = await prisma.$queryRaw`exec [dbo].[COMMON_DATA_LOG_Get_List] ${TABLE_NAME}, ${FK_SERIAL}, null, null, 0;`;
+  return dataLog;
 }
